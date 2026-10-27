@@ -1,0 +1,215 @@
+{
+  "run": "f150c2ac4642",
+  "base_url": "http://localhost:18081",
+  "results": [
+    {
+      "name": "authentication None",
+      "expected": 401,
+      "observed": 401,
+      "verdict": "pass"
+    },
+    {
+      "name": "authentication wrong-credential",
+      "expected": 401,
+      "observed": 401,
+      "verdict": "pass"
+    },
+    {
+      "name": "unknown field",
+      "expected": 400,
+      "observed": 400,
+      "verdict": "pass"
+    },
+    {
+      "name": "multiple objects",
+      "expected": 400,
+      "observed": 400,
+      "verdict": "pass"
+    },
+    {
+      "name": "oversized body",
+      "expected": 413,
+      "observed": 413,
+      "verdict": "pass"
+    },
+    {
+      "name": "null object",
+      "expected": 400,
+      "observed": 400,
+      "verdict": "pass"
+    },
+    {
+      "name": "unowned account",
+      "expected": 404,
+      "observed": 404,
+      "verdict": "pass"
+    },
+    {
+      "name": "32 concurrent identical comments",
+      "expected": "one execution, one fresh receipt",
+      "observed": {
+        "statuses": [
+          200
+        ],
+        "executions": 1,
+        "fresh": 1
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "changed content replay",
+      "expected": 409,
+      "observed": 409,
+      "verdict": "pass"
+    },
+    {
+      "name": "logical object replay",
+      "expected": "duplicate original execution",
+      "observed": {
+        "outcome": "created",
+        "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+        "duplicate": true
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "quoted email local part",
+      "expected": "invalid_email; stay waiting",
+      "observed": {
+        "outcome": "invalid_email",
+        "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+        "duplicate": false
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "quoted email workflow effect",
+      "expected": "stay waiting without final link",
+      "observed": {
+        "id": "d66499bc5b596e00a4cf2c91edd18e7a",
+        "automation_id": "5b8e8189e7d2bb34e4df951b1e31f8d0",
+        "account_id": "account-123",
+        "platform": "instagram",
+        "user_id": "f150c2ac4642uparallel",
+        "comment_id": "f150c2ac4642cparallel",
+        "state": "WAITING_FOR_EMAIL",
+        "snapshot": {
+          "id": "5b8e8189e7d2bb34e4df951b1e31f8d0",
+          "account_id": "account-123",
+          "platform": "instagram",
+          "keyword": "auditf150c2ac4642",
+          "comment_reply": "Reply",
+          "email_prompt": "Email?",
+          "link": "https://example.com",
+          "enabled": true,
+          "created_at": "2026-10-27T07:27:52.208126Z"
+        },
+        "email_received": false,
+        "created_at": "2026-10-27T07:27:52.222946Z",
+        "updated_at": "2026-10-27T07:27:52.291762Z",
+        "expires_at": "2026-10-28T07:27:52.291762Z",
+        "actions": [
+          {
+            "id": "9a0ee2830dcec2c73716c04386d92d4a",
+            "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+            "account_id": "account-123",
+            "platform": "instagram",
+            "user_id": "f150c2ac4642uparallel",
+            "comment_id": "f150c2ac4642cparallel",
+            "kind": "reply_comment",
+            "body": "Reply",
+            "status": "delivered",
+            "attempts": 1,
+            "available_at": "2026-10-27T07:27:52.224193Z"
+          },
+          {
+            "id": "89fd0fc4b46afb1a0fcfb19b82287bce",
+            "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+            "account_id": "account-123",
+            "platform": "instagram",
+            "user_id": "f150c2ac4642uparallel",
+            "comment_id": "f150c2ac4642cparallel",
+            "kind": "request_email",
+            "body": "Email?",
+            "status": "delivered",
+            "attempts": 1,
+            "available_at": "2026-10-27T07:27:52.288754Z"
+          }
+        ]
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "invalid destination https://.",
+      "expected": 400,
+      "observed": {
+        "status": 400,
+        "response": {
+          "error": "invalid input"
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "invalid destination https://example.com:99999",
+      "expected": 400,
+      "observed": {
+        "status": 400,
+        "response": {
+          "error": "invalid input"
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "duplicate JSON member",
+      "expected": "400 for ambiguous field",
+      "observed": {
+        "status": 400,
+        "response": {
+          "error": "invalid or ambiguous JSON body"
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "invalid UTF-8",
+      "expected": "400 without silently changing content",
+      "observed": {
+        "status": 400,
+        "response": {
+          "error": "invalid or ambiguous JSON body"
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "case insensitive media type",
+      "expected": 201,
+      "observed": {
+        "status": 201,
+        "response": {
+          "id": "bc8f28f9d0f60b4241e5760300d14264",
+          "account_id": "account-123",
+          "platform": "instagram",
+          "keyword": "auditf150c2ac4642",
+          "comment_reply": "Reply",
+          "email_prompt": "Email?",
+          "link": "https://example.com",
+          "enabled": true,
+          "created_at": "2026-10-27T07:27:52.411777Z"
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "bounded list pagination",
+      "expected": "bounded response",
+      "observed": {
+        "status": 200,
+        "count": 1
+      },
+      "verdict": "pass"
+    }
+  ]
+}

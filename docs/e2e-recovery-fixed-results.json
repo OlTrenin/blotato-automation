@@ -1,0 +1,28 @@
+{
+  "sigkill_after_remote_success": {
+    "execution_id": "3288101bc24d8a430a095600464a97c4",
+    "state": "WAITING_FOR_EMAIL",
+    "attempts": 2,
+    "effects": 2,
+    "crash_boundary": {
+      "status": "pending",
+      "attempts": 1
+    },
+    "verdict": "pass"
+  },
+  "database_outage": {
+    "readyz": 503,
+    "healthz": 200,
+    "ingestion": 500,
+    "response": {
+      "error": "internal error"
+    },
+    "verdict": "pass"
+  },
+  "database_recovery_and_retry": {
+    "state": "COMPLETED",
+    "effects": 3,
+    "duplicate": true,
+    "verdict": "pass"
+  }
+}
