@@ -1,0 +1,10 @@
+DROP TABLE simulator_failures;
+DROP TABLE simulator_effects;
+DROP TABLE actions;
+DROP TABLE event_receipts;
+DROP TABLE inbound_events;
+DROP TABLE executions;
+DROP TABLE automations;
+DROP TABLE connected_accounts;
+DROP TABLE tenants;
+DELETE FROM schema_migrations WHERE version = 1;
