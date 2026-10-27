@@ -198,3 +198,25 @@ func TestRateLimitIsSharedByTenantAndDoesNotGrowWithAttackers(t *testing.T) {
 		t.Fatal("invalid credential accepted")
 	}
 }
+
+func (s *scopedRepository) Ingest(_ context.Context, _ string, _ string, _ domain.Event) (domain.EventResult, error) {
+	return domain.EventResult{}, nil
+}
+
+func TestRejectsUnicodeJSONFieldAliases(t *testing.T) {
+	body := `{"event_id":"e","platform":"instagram","account_id":"a","user_id":"u","post_id":"p","comment_id":"c","text":"hello","poſt_id":"other"}`
+	w := request(handler(&scopedRepository{}, true), "POST", "/v1/events/comments", body, testToken)
+	if w.Code != 400 {
+		t.Fatalf("Unicode alias overwrote canonical field: %d", w.Code)
+	}
+}
+
+func TestStrictJSONPreservesValidEscapes(t *testing.T) {
+	for _, reply := range []string{`"\ud83d\ude00"`, `"literal \\ud800"`, `"Quote: \"yes\""`, `"Привет"`} {
+		body := `{"platform":"instagram","account_id":"account-123","keyword":"pricing","comment_reply":` + reply + `,"email_prompt":"Email?","link":"https://example.com"}`
+		w := request(handler(&scopedRepository{}, true), "POST", "/v1/automations", body, testToken)
+		if w.Code != 201 {
+			t.Fatalf("valid string %s rejected: %d %s", reply, w.Code, w.Body.String())
+		}
+	}
+}

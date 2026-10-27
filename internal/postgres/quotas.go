@@ -1,8 +1,9 @@
 package postgres
 
 import (
-	"blotato/internal/domain"
 	"context"
+
+	"blotato/internal/domain"
 	"github.com/jackc/pgx/v5"
 )
 

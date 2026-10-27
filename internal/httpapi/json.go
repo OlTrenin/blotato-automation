@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"strconv"
-	"strings"
 )
 
 // strictJSON preserves the input's meaning before the legacy JSON decoder can
@@ -65,7 +64,7 @@ func jsonObject(d *json.Decoder, depth int) bool {
 		token, err := d.Token()
 		key, ok := token.(string)
 		// All API fields use canonical lower-case names.
-		if err != nil || !ok || key != strings.ToLower(key) || seen[key] {
+		if err != nil || !ok || !canonicalJSONKey(key) || seen[key] {
 			return false
 		}
 		seen[key] = true
@@ -75,6 +74,20 @@ func jsonObject(d *json.Decoder, depth int) bool {
 	}
 	token, err := d.Token()
 	return err == nil && token == json.Delim('}')
+}
+
+// ASCII-only names also exclude Unicode case-fold aliases (for example long-s
+// in poſt_id), which encoding/json otherwise treats as the same struct field.
+func canonicalJSONKey(key string) bool {
+	if key == "" {
+		return false
+	}
+	for _, r := range key {
+		if !(r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_') {
+			return false
+		}
+	}
+	return true
 }
 
 func jsonValue(d *json.Decoder, depth int) bool {

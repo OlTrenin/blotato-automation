@@ -35,6 +35,10 @@ jobs:
           python3 scripts/demo.py
           docker compose restart app
           python3 scripts/demo.py
+      - name: HTTP regression and abuse checks
+        env:
+          AUDIT_BASE_URL: http://localhost:8080
+        run: python3 scripts/e2e_audit.py
       - name: Compose logs
         if: failure()
         run: docker compose logs

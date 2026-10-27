@@ -149,9 +149,31 @@ def main():
     record("invalid UTF-8", "400 without silently changing content", dict(status=code, response=value), code == 400)
     code, value = create(base, content_type="Application/JSON")
     record("case insensitive media type", 201, dict(status=code, response=value), code == 201)
+    alias = json.dumps(comment("unicode", "unmatched")).encode()[:-1] + ',"poſt_id":"other"}'.encode()
+    code, value = call("POST", "/v1/events/comments", raw=alias)
+    record("Unicode JSON field alias", 400, dict(status=code, response=value), code == 400)
     code, value = call("GET", "/v1/automations?limit=1")
     record("bounded list pagination", "bounded response",
            dict(status=code, count=len(value)), code == 200 and len(value) <= 1)
+    # Bounded burst against a validation-only path: exercises the actual server
+    # limiter without creating DB records or putting pressure on the DB pool.
+    started = time.monotonic()
+    def rate_probe(_):
+        headers = {}
+        status, _ = call("GET", "/v1/automations/!", response_headers=headers)
+        return status, headers.get("Retry-After")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=32) as pool:
+        replies = list(pool.map(rate_probe, range(500)))
+    limited = [r for r in replies if r[0] == 429]
+    record("HTTP rate limit under bounded burst", "429 with Retry-After; no 5xx",
+           dict(requests=500, limited=len(limited), seconds=round(time.monotonic()-started,3),
+                statuses=sorted({r[0] for r in replies})),
+           bool(limited) and all(r[1] == "1" for r in limited)
+           and all(r[0] in (400,429) for r in replies))
+    time.sleep(1.1)
+    code, value = call("GET", "/v1/automations?limit=1")
+    record("rate limit replenishes", 200, code, code == 200)
+
 
 
 if __name__ == "__main__":

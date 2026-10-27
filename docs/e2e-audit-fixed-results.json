@@ -1,5 +1,5 @@
 {
-  "run": "f150c2ac4642",
+  "run": "751e598da0aa",
   "base_url": "http://localhost:18081",
   "results": [
     {
@@ -67,7 +67,7 @@
       "expected": "duplicate original execution",
       "observed": {
         "outcome": "created",
-        "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+        "execution_id": "59a117374370626cb77cc10a4977ec1b",
         "duplicate": true
       },
       "verdict": "pass"
@@ -77,7 +77,7 @@
       "expected": "invalid_email; stay waiting",
       "observed": {
         "outcome": "invalid_email",
-        "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+        "execution_id": "59a117374370626cb77cc10a4977ec1b",
         "duplicate": false
       },
       "verdict": "pass"
@@ -86,54 +86,54 @@
       "name": "quoted email workflow effect",
       "expected": "stay waiting without final link",
       "observed": {
-        "id": "d66499bc5b596e00a4cf2c91edd18e7a",
-        "automation_id": "5b8e8189e7d2bb34e4df951b1e31f8d0",
+        "id": "59a117374370626cb77cc10a4977ec1b",
+        "automation_id": "74d14186d60c85d51dfe3faaac5c891c",
         "account_id": "account-123",
         "platform": "instagram",
-        "user_id": "f150c2ac4642uparallel",
-        "comment_id": "f150c2ac4642cparallel",
+        "user_id": "751e598da0aauparallel",
+        "comment_id": "751e598da0aacparallel",
         "state": "WAITING_FOR_EMAIL",
         "snapshot": {
-          "id": "5b8e8189e7d2bb34e4df951b1e31f8d0",
+          "id": "74d14186d60c85d51dfe3faaac5c891c",
           "account_id": "account-123",
           "platform": "instagram",
-          "keyword": "auditf150c2ac4642",
+          "keyword": "audit751e598da0aa",
           "comment_reply": "Reply",
           "email_prompt": "Email?",
           "link": "https://example.com",
           "enabled": true,
-          "created_at": "2026-10-27T07:27:52.208126Z"
+          "created_at": "2026-10-27T07:35:50.279229Z"
         },
         "email_received": false,
-        "created_at": "2026-10-27T07:27:52.222946Z",
-        "updated_at": "2026-10-27T07:27:52.291762Z",
-        "expires_at": "2026-10-28T07:27:52.291762Z",
+        "created_at": "2026-10-27T07:35:50.29208Z",
+        "updated_at": "2026-10-27T07:35:50.357036Z",
+        "expires_at": "2026-10-28T07:35:50.357036Z",
         "actions": [
           {
-            "id": "9a0ee2830dcec2c73716c04386d92d4a",
-            "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+            "id": "ec9e39a6e5b321d6c49b5f86d83506ec",
+            "execution_id": "59a117374370626cb77cc10a4977ec1b",
             "account_id": "account-123",
             "platform": "instagram",
-            "user_id": "f150c2ac4642uparallel",
-            "comment_id": "f150c2ac4642cparallel",
+            "user_id": "751e598da0aauparallel",
+            "comment_id": "751e598da0aacparallel",
             "kind": "reply_comment",
             "body": "Reply",
             "status": "delivered",
             "attempts": 1,
-            "available_at": "2026-10-27T07:27:52.224193Z"
+            "available_at": "2026-10-27T07:35:50.296541Z"
           },
           {
-            "id": "89fd0fc4b46afb1a0fcfb19b82287bce",
-            "execution_id": "d66499bc5b596e00a4cf2c91edd18e7a",
+            "id": "87056552ad47fe758e2011c395bb62ad",
+            "execution_id": "59a117374370626cb77cc10a4977ec1b",
             "account_id": "account-123",
             "platform": "instagram",
-            "user_id": "f150c2ac4642uparallel",
-            "comment_id": "f150c2ac4642cparallel",
+            "user_id": "751e598da0aauparallel",
+            "comment_id": "751e598da0aacparallel",
             "kind": "request_email",
             "body": "Email?",
             "status": "delivered",
             "attempts": 1,
-            "available_at": "2026-10-27T07:27:52.288754Z"
+            "available_at": "2026-10-27T07:35:50.354736Z"
           }
         ]
       },
@@ -189,15 +189,26 @@
       "observed": {
         "status": 201,
         "response": {
-          "id": "bc8f28f9d0f60b4241e5760300d14264",
+          "id": "40ebe5595bb3208a32ba65302d89eb03",
           "account_id": "account-123",
           "platform": "instagram",
-          "keyword": "auditf150c2ac4642",
+          "keyword": "audit751e598da0aa",
           "comment_reply": "Reply",
           "email_prompt": "Email?",
           "link": "https://example.com",
           "enabled": true,
-          "created_at": "2026-10-27T07:27:52.411777Z"
+          "created_at": "2026-10-27T07:35:50.495512Z"
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "Unicode JSON field alias",
+      "expected": 400,
+      "observed": {
+        "status": 400,
+        "response": {
+          "error": "invalid or ambiguous JSON body"
         }
       },
       "verdict": "pass"
@@ -209,6 +220,26 @@
         "status": 200,
         "count": 1
       },
+      "verdict": "pass"
+    },
+    {
+      "name": "HTTP rate limit under bounded burst",
+      "expected": "429 with Retry-After; no 5xx",
+      "observed": {
+        "requests": 500,
+        "limited": 313,
+        "seconds": 0.182,
+        "statuses": [
+          400,
+          429
+        ]
+      },
+      "verdict": "pass"
+    },
+    {
+      "name": "rate limit replenishes",
+      "expected": 200,
+      "observed": 200,
       "verdict": "pass"
     }
   ]

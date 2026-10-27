@@ -56,10 +56,10 @@ test or certification.
 | Medium | Development bearer credentials, HTTP, disabled database TLS, and the Compose database owner role are local conveniences. | Use TLS, managed/rotatable secrets, independently verified provider ingress, separate least-privilege runtime/migration database roles, and restricted network access. Do not deploy the Compose defaults as production credentials. |
 | Low | Content hashes and social identifiers are retained indefinitely for replay correctness. | SHA-256 is deduplication evidence, not anonymization: guessable message content can be tested against a hash. Protect these records as personal data and establish a retention/replay policy. |
 
-The unbounded reads include `ListAutomations`, `ListExecutions`, `ListOutbound`,
-and automation matching in `ingestComment`. A growing tenant can increase
-response size, database work, and conversation-lock time. Add cursor pagination,
-automation quotas, and queue/table-growth monitoring before shared production use.
+`ListAutomations`, `ListExecutions`, and `ListOutbound` now use bounded cursor
+pagination. Automation matching scans pages of 100 and stops at the oldest match;
+existing tenants above the new definition cap keep working after upgrade.
+Queue/table-growth monitoring remains an operational requirement.
 
 The ingress adapter is responsible for validating provider signatures,
 timestamps/replay windows where available, the connected account, post
@@ -117,7 +117,7 @@ network security testing is claimed.
 The email extractor keeps quoted constructs intact and never accepts an address
 fragment from a quoted local part. Link validation checks DNS labels, IP literals
 and TCP port bounds without making network requests. Content-Type parsing follows
-media type case rules. See the [remediation evidence](e2e-remediation-2026-10-27.md).
+media type case rules. See the [remediation evidence](testing.md#audit-remediation-verification--2026-10-27).
 
 Tenant buckets are allocated only for configured identities, avoiding unbounded
 IP/credential-keyed limiter maps. Limits apply before obtaining DB connections;
