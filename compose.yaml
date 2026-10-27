@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: blotato
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-postgres-only}
+      POSTGRES_DB: blotato
+    ports:
+      - "127.0.0.1:${PG_PORT:-55432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blotato -d blotato"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgres://blotato:${POSTGRES_PASSWORD:-local-postgres-only}@db:5432/blotato?sslmode=disable
+      API_TOKEN: ${API_TOKEN:-local-demo-token-change-me}
+      TENANT_ID: tenant-demo
+      ACCOUNT_ID: account-123
+      DEMO_MODE: "true"
+      ADDR: :8080
+      WORKERS: "2"
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:8080/readyz"]
+      interval: 5s
+      timeout: 2s
+      retries: 12
+    stop_grace_period: 25s
+volumes:
+  postgres-data:

@@ -1,0 +1,43 @@
+name: verify
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: blotato
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: blotato_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U blotato -d blotato_test"
+          --health-interval 2s --health-timeout 2s --health-retries 30
+    env:
+      TEST_DATABASE_URL: postgres://blotato:test-only-password@localhost:5432/blotato_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.10'
+          cache: true
+      - name: Format
+        run: test -z "$(gofmt -l cmd internal integration)"
+      - run: go vet ./...
+      - run: go test -race -count=1 ./...
+      - run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+      - name: Build container and execute full demo
+        run: |
+          docker compose up --build -d --wait
+          python3 scripts/demo.py
+          docker compose restart app
+          python3 scripts/demo.py
+      - name: Compose logs
+        if: failure()
+        run: docker compose logs
+      - name: Shutdown
+        if: always()
+        run: docker compose down
